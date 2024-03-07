@@ -30,6 +30,8 @@ public:
 
 	void sendPositionFood(Player* player);
 
+	void checkEventShot(Player* player);
+
 private:
 
 	std::vector<Player*>& players;
@@ -38,5 +40,4 @@ private:
 	std::vector<Food*> update_food;
 
 	int count_food;
-	int mass_food;
 };

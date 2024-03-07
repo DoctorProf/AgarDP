@@ -40,7 +40,7 @@ double Player::getRadius() {
 void Player::update() {
 
 	radius = pow(mass, 1 / 1.5);
-	velocity = 100.0 / sqrt(mass) + 3.0;
+	velocity = 80.0 / sqrt(mass) + 3.0;
 	zoom = 50.0 / radius + 0.2;
 	mass = mass * 0.99995;
 }

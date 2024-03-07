@@ -3,11 +3,10 @@
 Game::Game(std::vector<Player*>& players, std::vector<Food*>& foods, int count_food) : players(players), foods(foods) {
 
 	this->count_food = count_food;
-	this->mass_food = 1;
 
 	for (int i = 0; i < count_food; i++) {
 
-		foods.push_back(new Food(i, Vector2<double>(data::generateNumber(-3840, 3840), data::generateNumber(-2160, 2160))));
+		foods.push_back(new Food(i, Vector2<double>(data::generateNumber(-3840, 3840), data::generateNumber(-2160, 2160)), 5, 1));
 	}
 }
 
@@ -27,13 +26,14 @@ void Game::collisionFood() {
 	for (Player* player : players) {
 
 		auto food = std::find_if(foods.begin(), foods.end(), [&](const auto& it) {
-			return data::distance(player->getPosition(), it->getPosition()) <
-				(player->getRadius() + it->getRadius());
+
+			return data::distance(player->getPosition(), it->getPosition()) < player->getRadius() &&
+				it->getMass() < player->getMass();
 			});
 
 		if (food != foods.end()) {
 
-			player->setMass(player->getMass() + mass_food);
+			player->setMass(player->getMass() + (*food)->getMass());
 			(*food)->regeneratePosition();
 
 			update_food.push_back(*food);
@@ -49,8 +49,7 @@ void Game::collisionPlayers() {
 
 		auto player1 = std::find_if(players.begin(), players.end(), [&](const auto& other) {
 
-			return player != other && data::distance(player->getPosition(), other->getPosition()) <
-				((player->getRadius() + other->getRadius()) / 2);
+			return player != other && data::distance(player->getPosition(), other->getPosition()) < abs(player->getRadius() - other->getRadius());
 			});
 
 		if (player1 == players.end()) continue;
@@ -166,6 +165,26 @@ void Game::sendPositionFood(Player* player) {
 	}
 
 	player->getSocket()->send(packet_food);
+}
+
+void Game::checkEventShot(Player* player) {
+
+	while (true) {
+
+		Packet event_shot;
+
+		player->getSocket()->receive(event_shot);
+
+		std::string event_player;
+
+		event_shot >> event_player;
+
+		if (event_player == "LKM") {
+
+			player->setMass(player->getMass() + 20);
+		}
+	}
+	
 }
 
 

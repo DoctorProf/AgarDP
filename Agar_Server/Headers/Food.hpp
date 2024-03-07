@@ -11,13 +11,13 @@ class Food {
 
 public:
 
-	Food(int id, Vector2<double> position);
+	Food(int id, Vector2<double> position, double radius, double mass);
 
 	Vector2<double> getPosition();
 
 	double getRadius();
 
-
+	double getMass();
 
 	void regeneratePosition();
 
@@ -28,6 +28,8 @@ private:
 	int id;
 
 	double radius;
+
+	double mass;
 
 	Vector2<double> position;
 };

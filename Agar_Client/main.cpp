@@ -4,7 +4,9 @@
 #include "Headers/Food.hpp"
 #include <SFML/Network.hpp>
 #include <fstream>
+#include <SFML/GpuPreference.hpp>
 
+#define SFML_DEFINE_DISCRETE_GPU_PREFERENCE
 
 using namespace sf;
 
@@ -252,6 +254,14 @@ int main() {
 
 				window.close();
 				socket->disconnect();
+			}
+			if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
+
+				Packet event_shot;
+
+				event_shot << "LKM";
+
+				socket->send(event_shot);
 			}
 		}
 

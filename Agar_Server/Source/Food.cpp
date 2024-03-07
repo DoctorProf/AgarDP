@@ -1,11 +1,12 @@
 #include "../Headers/Food.hpp"
 
 
-Food::Food(int id, Vector2<double> position) {
+Food::Food(int id, Vector2<double> position, double radius, double mass) {
 
-	this->radius = 5;
 	this->id = id;
 	this->position = position;
+	this->radius = radius;
+	this->mass = mass;
 }
 
 Vector2<double> Food::getPosition() {
@@ -16,6 +17,11 @@ Vector2<double> Food::getPosition() {
 double Food::getRadius() {
 
 	return radius;
+}
+
+double Food::getMass() {
+
+	return mass;
 }
 
 void Food::regeneratePosition() {
