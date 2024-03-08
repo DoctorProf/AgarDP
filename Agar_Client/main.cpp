@@ -5,6 +5,7 @@
 #include <SFML/Network.hpp>
 #include <fstream>
 #include <SFML/GpuPreference.hpp>
+#include <ppl.h>
 
 #define SFML_DEFINE_DISCRETE_GPU_PREFERENCE
 
@@ -131,7 +132,6 @@ void updatePositionFood(TcpSocket* socket, std::vector<Food*>& foods) {
 
 		(*food)->setPosition(Vector2<double>(x, y));
 	}
-
 }
 
 void generatePlayers(TcpSocket* socket, std::vector<Player*>& players) {

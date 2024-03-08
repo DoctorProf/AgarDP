@@ -10,7 +10,7 @@ int main() {
 
     std::vector<Food*> foods;
 
-    int count_food = 5000;
+    int count_food = 15000;
     bool running = true;
 
     Game game(players, foods, count_food);
@@ -38,9 +38,12 @@ int main() {
 
                 if (listener.accept(*new_connection) == sf::Socket::Done) {
 
-                    Player* player = new Player(new_connection, Vector2<double>(data::generateNumber(0, 1920), data::generateNumber(0, 1080)));
+                    Player* player = new Player(new_connection, Vector2<double>(data::generateNumber(-3840, 3840), data::generateNumber(-2160, 2160)));
                     players.push_back(player);
                     std::cout << " Players - " << players.size() << "\n";
+
+                    //std::thread* events_player = new std::thread(&Game::checkEventShot, &game, std::ref(player));
+                    //events_player->detach();
 
                     std::thread send_position_food(&Game::sendPositionFood, &game, std::ref(player));
                     send_position_food.detach();

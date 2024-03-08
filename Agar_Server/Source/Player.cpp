@@ -5,7 +5,6 @@ Player::Player(TcpSocket* socket, Vector2<double> position) : socket(socket) {
 
 	this->position = position;
 	this->mass = 20;
-
 	this->color = data::randomColor();
 }
 

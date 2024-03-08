@@ -28,7 +28,7 @@ void Game::collisionFood() {
 		auto food = std::find_if(foods.begin(), foods.end(), [&](const auto& it) {
 
 			return data::distance(player->getPosition(), it->getPosition()) < player->getRadius() &&
-				it->getMass() < player->getMass();
+				it->getRadius() < player->getRadius();
 			});
 
 		if (food != foods.end()) {
@@ -135,6 +135,8 @@ void Game::getFromPlayer() {
 
 		packet_mouse_pos >> packet_message;
 
+		std::cout << "Mouse " << packet_message << std::endl;
+
 		if (packet_message == "mouse_pos") {
 
 			packet_mouse_pos >> x >> y;
@@ -175,27 +177,20 @@ void Game::sendPositionFood(Player* player) {
 
 void Game::checkEventShot(Player* player) {
 
-	Time time_per_frame = seconds(1.0 / 30.0);
-	Time accumulate = Time::Zero;
+	Packet event_shot;
 
-	Clock ev;
-
-	while ((accumulate + ev.restart()) > time_per_frame ) {
-
-		Packet event_shot;
-
-		player->getSocket()->receive(event_shot);
+	while (player->getSocket()->receive(event_shot) != Socket::Done) {
 
 		std::string event_player;
-
 		event_shot >> event_player;
+
+		std::cout << "Shot " << event_player << std::endl;
 
 		if (event_player == "shot") {
 
 			player->setMass(player->getMass() + 20);
 		}
 	}
-	
 }
 
 
