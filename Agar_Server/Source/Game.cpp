@@ -131,9 +131,15 @@ void Game::getFromPlayer() {
 
 		double x;
 		double y;
+		std::string packet_message;
 
-		packet_mouse_pos >> x >> y;
-		player->setLastMousePos(Vector2<double>(x, y));
+		packet_mouse_pos >> packet_message;
+
+		if (packet_message == "mouse_pos") {
+
+			packet_mouse_pos >> x >> y;
+			player->setLastMousePos(Vector2<double>(x, y));
+		}		
 	}
 }
 
@@ -169,7 +175,12 @@ void Game::sendPositionFood(Player* player) {
 
 void Game::checkEventShot(Player* player) {
 
-	while (true) {
+	Time time_per_frame = seconds(1.0 / 30.0);
+	Time accumulate = Time::Zero;
+
+	Clock ev;
+
+	while ((accumulate + ev.restart()) > time_per_frame ) {
 
 		Packet event_shot;
 
@@ -179,7 +190,7 @@ void Game::checkEventShot(Player* player) {
 
 		event_shot >> event_player;
 
-		if (event_player == "LKM") {
+		if (event_player == "shot") {
 
 			player->setMass(player->getMass() + 20);
 		}

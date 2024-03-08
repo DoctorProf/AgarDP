@@ -54,7 +54,7 @@ bool getFromServer(TcpSocket* socket, Player* player, double& zoom) {
 
 	if (socket->receive(packet_player) != Socket::Done) {
 
-		std::cout << "No data to server" << std::endl;
+		std::cerr << "No data to server" << std::endl;
 		return 1;
 	}
 
@@ -80,37 +80,10 @@ void sendToServer(TcpSocket* socket, Vector2<double>& last_mouse_pos) {
 
 	Packet packet_mouse_pos;
 
-	packet_mouse_pos << last_mouse_pos.x << last_mouse_pos.y;
+	packet_mouse_pos << "mouse_pos" << last_mouse_pos.x << last_mouse_pos.y;
 	socket->send(packet_mouse_pos);
 }
 
-void render(Player*& player, std::vector<Player*>& players, std::vector<Food*>& foods, RenderWindow& window, View& world, View& gui, Vector2f& size, VertexArray& grid, Text& score) {
-
-	window.clear(Color::White);
-
-	world.setSize(size);
-	world.setCenter(Vector2f(player->getPosition()));
-
-	window.setView(world);
-
-	window.draw(grid);
-
-	for (Food* food : foods) {
-
-		food->draw(window);
-	}
-
-	player->draw(window);
-
-	for (Player* player : players) {
-
-		player->draw(window);
-	}
-
-	window.setView(gui);
-	window.draw(score);
-	window.display();
-}
 
 void getPositionFood(TcpSocket* socket, std::vector<Food*>& foods) {
 
@@ -194,6 +167,35 @@ void generatePlayers(TcpSocket* socket, std::vector<Player*>& players) {
 		players.push_back(player);
 	}
 }
+
+void render(Player*& player, std::vector<Player*>& players, std::vector<Food*>& foods, RenderWindow& window, View& world, View& gui, Vector2f& size, VertexArray& grid, Text& score) {
+
+	window.clear(Color::White);
+
+	world.setSize(size);
+	world.setCenter(Vector2f(player->getPosition()));
+
+	window.setView(world);
+
+	window.draw(grid);
+
+	for (Food* food : foods) {
+
+		food->draw(window);
+	}
+
+	player->draw(window);
+
+	for (Player* player : players) {
+
+		player->draw(window);
+	}
+
+	window.setView(gui);
+	window.draw(score);
+	window.display();
+}
+
 int main() {
 
 	TcpSocket* socket = new TcpSocket;
@@ -259,7 +261,7 @@ int main() {
 
 				Packet event_shot;
 
-				event_shot << "LKM";
+				event_shot << "shot";
 
 				socket->send(event_shot);
 			}

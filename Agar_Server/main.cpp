@@ -10,9 +10,7 @@ int main() {
 
     std::vector<Food*> foods;
 
-    std::vector<std::thread*> events;
-
-    int count_food = 10000;
+    int count_food = 5000;
     bool running = true;
 
     Game game(players, foods, count_food);
@@ -43,9 +41,9 @@ int main() {
                     Player* player = new Player(new_connection, Vector2<double>(data::generateNumber(0, 1920), data::generateNumber(0, 1080)));
                     players.push_back(player);
                     std::cout << " Players - " << players.size() << "\n";
-                    std::thread* new_player_thread = new std::thread(&Game::checkEventShot, &game, std::ref(player));
-                    events.push_back(new_player_thread);
-                    game.sendPositionFood(player);
+
+                    std::thread send_position_food(&Game::sendPositionFood, &game, std::ref(player));
+                    send_position_food.detach();
                 }
             }
         }
@@ -60,11 +58,6 @@ int main() {
         game.updatePlayers();
 
         game.sendToPlayer();
-    }
-
-    for (std::thread* thread : events) {
-
-        thread->join();
     }
 
     return 0;
