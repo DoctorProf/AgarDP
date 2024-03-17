@@ -11,7 +11,9 @@ class Food {
 
 public:
 
-	Food(int id, Vector2<double> position, double radius, double mass);
+	Food(int id, Vector2<double> position, Vector2<double> velocity, double radius, double mass);
+
+	void move();
 
 	Vector2<double> getPosition();
 
@@ -23,6 +25,10 @@ public:
 
 	int getId();
 
+	void setColor(std::tuple<int, int, int> color);
+
+	std::tuple<int, int, int> getColor();
+
 private:
 
 	int id;
@@ -32,4 +38,8 @@ private:
 	double mass;
 
 	Vector2<double> position;
+
+	Vector2<double> velocity;
+
+	std::tuple<int, int, int> color;
 };

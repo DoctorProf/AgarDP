@@ -4,7 +4,7 @@
 Player::Player(TcpSocket* socket, Vector2<double> position) : socket(socket) {
 
 	this->position = position;
-	this->mass = 20;
+	this->mass = 50;
 	this->color = data::randomColor();
 }
 
@@ -12,9 +12,9 @@ void Player::move() {
 
 	update();
 
-	double dist = data::distance(last_mouse_pos, position);
+	dist = data::distance(last_mouse_pos, position);
 
-	Vector2<double> direction = (last_mouse_pos - position) / dist;
+	direction = (last_mouse_pos - position) / dist;
 
 	if (dist < radius || !data::frame_collision(position + velocity * direction, { 7680, 4320 })) return;
 
@@ -72,5 +72,23 @@ void Player::setLastMousePos(Vector2<double> last_mouse_pos) {
 std::tuple<int, int, int> Player::getColor() {
 
 	return color;
+}
+
+void Player::strikePlayer(std::vector<Food*>& food_players) {
+
+	if (mass > 70) {
+
+		Vector2<double> pos = position + (2 * radius * direction);
+
+		Food* new_food = new Food(food_players.size(), pos, 15.0 * direction, 10, 20);
+		new_food->setColor(color);
+		food_players.push_back(new_food);
+		mass -= 20;
+	}
+}
+
+void Player::segmentationPlayer() {
+
+
 }
 

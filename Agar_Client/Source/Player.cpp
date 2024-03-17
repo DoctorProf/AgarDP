@@ -4,9 +4,6 @@
 Player::Player() {
 
 	player.setPointCount(100);
-
-	player.setOutlineThickness(1);
-	player.setOutlineColor(Color::Black);
 }
 
 void Player::draw(RenderWindow& window) {

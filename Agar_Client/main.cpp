@@ -77,12 +77,14 @@ bool getFromServer(TcpSocket* socket, Player* player, double& zoom) {
 	return 0;
 }
 
-void sendToServer(TcpSocket* socket, Vector2<double>& last_mouse_pos) {
+void sendToServer(TcpSocket* socket, Vector2<double>& last_mouse_pos, bool& strike, bool& segmentation) {
 
 	Packet packet_mouse_pos;
+	packet_mouse_pos << last_mouse_pos.x << last_mouse_pos.y << strike << segmentation;
 
-	packet_mouse_pos << "mouse_pos" << last_mouse_pos.x << last_mouse_pos.y;
 	socket->send(packet_mouse_pos);
+	strike = false;
+	segmentation = false;
 }
 
 
@@ -104,7 +106,7 @@ void getPositionFood(TcpSocket* socket, std::vector<Food*>& foods) {
 
 		packet_food >> id >> x >> y;
 
-		foods.push_back(new Food(id, Vector2<double>(x, y)));
+		foods.push_back(new Food(id, 5, Vector2<double>(x, y)));
 	}
 }
 
@@ -168,7 +170,38 @@ void generatePlayers(TcpSocket* socket, std::vector<Player*>& players) {
 	}
 }
 
-void render(Player*& player, std::vector<Player*>& players, std::vector<Food*>& foods, RenderWindow& window, View& world, View& gui, Vector2f& size, VertexArray& grid, Text& score) {
+void generateFoodPlayers(TcpSocket* socket, std::vector<Food*>& food_players) {
+
+	food_players.clear();
+
+	Packet packet_food_players;
+
+	size_t count_food_players{};
+
+	socket->receive(packet_food_players);
+
+	packet_food_players >> count_food_players;
+
+	for (int i = 0; i < count_food_players; i++) {
+
+		int id;
+		double x;
+		double y;
+
+		int r;
+		int g;
+		int b;
+
+		packet_food_players >> id >> x >> y >> r >> g >> b;
+
+		Food* food = new Food(id, 10, Vector2<double>(x, y));
+		food->setColor(r, g, b);
+
+		food_players.push_back(food);
+	}
+}
+
+void render(Player*& player, std::vector<Player*>& players, std::vector<Food*>& foods, std::vector<Food*> food_players, RenderWindow& window, View& world, View& gui, Vector2f& size, VertexArray& grid, Text& score) {
 
 	window.clear(Color::White);
 
@@ -180,6 +213,11 @@ void render(Player*& player, std::vector<Player*>& players, std::vector<Food*>& 
 	window.draw(grid);
 
 	for (Food* food : foods) {
+
+		food->draw(window);
+	}
+
+	for (Food* food : food_players) {
 
 		food->draw(window);
 	}
@@ -201,9 +239,15 @@ int main() {
 	TcpSocket* socket = new TcpSocket;
 
 	std::vector<Food*> foods;
+	std::vector<Food*> food_players;
 	std::vector<Player*> players;
 
+	bool strike = false;
+	bool segmentation = false;
+
 	Vector2<int> size_map = { 7680, 4320 };
+
+	Vector2f size{};
 
 	std::ifstream config("config.txt");
 
@@ -259,11 +303,11 @@ int main() {
 			}
 			if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
 
-				Packet event_shot;
+				strike = true;
+			}
+			if (event.type == Event::KeyPressed && event.key.code == Keyboard::Space) {
 
-				event_shot << "shot";
-
-				socket->send(event_shot);
+				segmentation = true;
 			}
 		}
 
@@ -271,18 +315,19 @@ int main() {
 
 		last_mouse_pos = Vector2<double>(window.mapPixelToCoords(Mouse::getPosition(window)));
 
-		sendToServer(socket, last_mouse_pos);
+		sendToServer(socket, last_mouse_pos, strike, segmentation);
 
 		updatePositionFood(socket, foods);
 
 		generatePlayers(socket, players);
+		generateFoodPlayers(socket, food_players);
 
 		if (getFromServer(socket, player, zoom)) return 0;
 
-		Vector2f size = Vector2f(window.getSize().x, window.getSize().y) / (float)zoom;
+		size = Vector2f(window.getSize().x, window.getSize().y) / (float)zoom;
 
 		score.setString("Score - " + std::to_string((int)player->getMass()));
 
-		render(player, players, foods, window, world, gui, size, grid, score);
+		render(player, players, foods, food_players, window, world, gui, size, grid, score);
 	}
 }

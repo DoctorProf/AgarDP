@@ -6,7 +6,7 @@ Game::Game(std::vector<Player*>& players, std::vector<Food*>& foods, int count_f
 
 	for (int i = 0; i < count_food; i++) {
 
-		foods.push_back(new Food(i, Vector2<double>(data::generateNumber(-3840, 3840), data::generateNumber(-2160, 2160)), 5, 1));
+		foods.push_back(new Food(i, Vector2<double>(data::generateNumber(-3840, 3840), data::generateNumber(-2160, 2160)), { 0.0, 0.0 }, 5, 1));
 	}
 }
 
@@ -16,6 +16,11 @@ void Game::movePlayers() {
 	for (Player*& player : players) {
 
 		player->move();
+	}
+
+	for (Food* food : food_players) {
+
+		food->move();
 	}
 }
 
@@ -27,8 +32,7 @@ void Game::collisionFood() {
 
 		auto food = std::find_if(foods.begin(), foods.end(), [&](const auto& it) {
 
-			return data::distance(player->getPosition(), it->getPosition()) < player->getRadius() &&
-				it->getRadius() < player->getRadius();
+			return data::distance(player->getPosition(), it->getPosition()) < player->getRadius() && it->getRadius() < player->getRadius();
 			});
 
 		if (food != foods.end()) {
@@ -97,6 +101,7 @@ void Game::updatePlayers() {
 	for (Player* player : players) {
 
 		Packet packet_player_data;
+		Packet packet_food_players;
 
 		packet_player_data << (size_t)(players.size() - 1);
 
@@ -106,10 +111,25 @@ void Game::updatePlayers() {
 
 			std::tuple<int, int, int> color = player1->getColor();
 
-			packet_player_data << player1->getRadius() << player1->getPosition().x << player1->getPosition().y << std::get<0>(color) << std::get<1>(color) << std::get<2>(color);;
+			packet_player_data << player1->getRadius() << player1->getPosition().x << player1->getPosition().y << std::get<0>(color) << std::get<1>(color) << std::get<2>(color);
 
 		}
+
 		player->getSocket()->send(packet_player_data);
+
+		packet_food_players << food_players.size();
+
+		for (int i = 0; i < food_players.size(); i++) {
+
+			Vector2<double> position = food_players[i]->getPosition();
+
+			std::tuple<int, int, int> color = food_players[i]->getColor();
+
+			packet_food_players << food_players[i]->getId() << position.x << position.y << std::get<0>(color) << std::get<1>(color) << std::get<2>(color);
+		}
+
+
+		player->getSocket()->send(packet_food_players);
 	}
 }
 
@@ -131,17 +151,14 @@ void Game::getFromPlayer() {
 
 		double x;
 		double y;
-		std::string packet_message;
+		bool strike;
+		bool segmentation;
 
-		packet_mouse_pos >> packet_message;
+		packet_mouse_pos >> x >> y >> strike >> segmentation;
+		player->setLastMousePos(Vector2<double>(x, y));	
 
-		std::cout << "Mouse " << packet_message << std::endl;
-
-		if (packet_message == "mouse_pos") {
-
-			packet_mouse_pos >> x >> y;
-			player->setLastMousePos(Vector2<double>(x, y));
-		}		
+		if (strike) player->strikePlayer(food_players);
+		if (segmentation) player->segmentationPlayer();
 	}
 }
 
@@ -173,24 +190,6 @@ void Game::sendPositionFood(Player* player) {
 	}
 
 	player->getSocket()->send(packet_food);
-}
-
-void Game::checkEventShot(Player* player) {
-
-	Packet event_shot;
-
-	while (player->getSocket()->receive(event_shot) != Socket::Done) {
-
-		std::string event_player;
-		event_shot >> event_player;
-
-		std::cout << "Shot " << event_player << std::endl;
-
-		if (event_player == "shot") {
-
-			player->setMass(player->getMass() + 20);
-		}
-	}
 }
 
 

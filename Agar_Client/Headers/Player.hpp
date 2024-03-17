@@ -1,8 +1,6 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
 #include <iostream>
-#include "boost/random.hpp"
 #include "Data.hpp"
 
 using namespace sf;
@@ -12,6 +10,8 @@ class Player {
 public:
 
 	Player();
+
+	void update();
 
 	void draw(RenderWindow& window);
 
@@ -24,8 +24,6 @@ public:
 	double getMass();
 
 	void setRadius(double radius);
-
-	void update();
 
 	void setColor(int r, int g, int b);
 

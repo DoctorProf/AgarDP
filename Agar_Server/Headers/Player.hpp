@@ -4,6 +4,7 @@
 #include "boost/random.hpp"
 #include "Data.hpp"
 #include <SFML/Network.hpp>
+#include "Food.hpp"
 
 using namespace sf;
 
@@ -35,6 +36,10 @@ public:
 
 	std::tuple<int, int, int> getColor();
 
+	void strikePlayer(std::vector<Food*>& food_players);
+
+	void segmentationPlayer();
+
 private:
 
 	TcpSocket* socket;
@@ -45,6 +50,9 @@ private:
 	Vector2<double> last_mouse_pos;
 	double velocity;
 	double zoom;
+
+	double dist;
+	Vector2<double> direction;
 
 	std::tuple<int, int, int> color;
 };

@@ -1,12 +1,19 @@
 #include "../Headers/Food.hpp"
 
 
-Food::Food(int id, Vector2<double> position, double radius, double mass) {
+Food::Food(int id, Vector2<double> position, Vector2<double> velocity, double radius, double mass) {
 
 	this->id = id;
 	this->position = position;
+	this->velocity = velocity;
 	this->radius = radius;
 	this->mass = mass;
+}
+
+void Food::move() {
+
+	velocity *= 0.99;
+	position += velocity;
 }
 
 Vector2<double> Food::getPosition() {
@@ -32,5 +39,15 @@ void Food::regeneratePosition() {
 int Food::getId() {
 
 	return id;
+}
+
+void Food::setColor(std::tuple<int, int, int> color) {
+
+	this->color = color;
+}
+
+std::tuple<int, int, int> Food::getColor() {
+
+	return color;
 }
 

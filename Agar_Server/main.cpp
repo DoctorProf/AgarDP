@@ -2,22 +2,31 @@
 #include "Headers/Player.hpp"
 #include "Headers/Game.hpp"
 #include <thread>
+#include <nlohmann/json.hpp>
+#include <fstream>
+
+using json = nlohmann::json;
+
 using namespace sf;
 
 int main() {
+
+    std::ifstream file_config("config_server.json");
+
+    json config = json::parse(file_config);
 
     std::vector<Player*> players;
 
     std::vector<Food*> foods;
 
-    int count_food = 15000;
+    int count_food = config["count_food"];
     bool running = true;
 
     Game game(players, foods, count_food);
 
     TcpListener listener;
 
-    if (listener.listen(5000) != Socket::Done) {
+    if (listener.listen(config["port"]) != Socket::Done) {
 
         std::cout << "Error" << std::endl;
         return 1;
@@ -41,9 +50,6 @@ int main() {
                     Player* player = new Player(new_connection, Vector2<double>(data::generateNumber(-3840, 3840), data::generateNumber(-2160, 2160)));
                     players.push_back(player);
                     std::cout << " Players - " << players.size() << "\n";
-
-                    //std::thread* events_player = new std::thread(&Game::checkEventShot, &game, std::ref(player));
-                    //events_player->detach();
 
                     std::thread send_position_food(&Game::sendPositionFood, &game, std::ref(player));
                     send_position_food.detach();

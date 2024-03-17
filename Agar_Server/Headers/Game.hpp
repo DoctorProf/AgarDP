@@ -30,14 +30,13 @@ public:
 
 	void sendPositionFood(Player* player);
 
-	void checkEventShot(Player* player);
-
 private:
 
 	std::vector<Player*>& players;
 	std::vector<Food*>& foods;
 
 	std::vector<Food*> update_food;
+	std::vector<Food*> food_players;
 
 	int count_food;
 };

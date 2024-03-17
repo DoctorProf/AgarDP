@@ -29,7 +29,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="config.txt" />
+    <Text Include="config_client.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Data.hpp">

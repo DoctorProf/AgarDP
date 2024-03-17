@@ -121,7 +121,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -134,7 +134,7 @@
     <ClCompile Include="Source\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="config.txt" />
+    <Text Include="config_client.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Data.hpp" />
