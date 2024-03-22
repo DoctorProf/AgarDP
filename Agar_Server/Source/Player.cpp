@@ -1,14 +1,14 @@
 #include "../Headers/Player.hpp"
 
 
-Player::Player(TcpSocket* socket, Vector2<double> position) : socket(socket) {
+Player::Player(TcpSocket*& socket, Vector2<double> position) : socket(socket) {
 
 	this->position = position;
 	this->mass = 50;
 	this->color = data::randomColor();
 }
 
-void Player::move() {
+void Player::move(Vector2<int> size_map) {
 
 	update();
 
@@ -16,7 +16,7 @@ void Player::move() {
 
 	direction = (last_mouse_pos - position) / dist;
 
-	if (dist < radius || !data::frame_collision(position + velocity * direction, { 7680, 4320 })) return;
+	if (dist < radius || !data::frame_collision(position + velocity * direction, size_map)) return;
 
 	position += velocity * direction;
 }
@@ -38,10 +38,10 @@ double Player::getRadius() {
 
 void Player::update() {
 
-	radius = pow(mass, 1 / 1.5);
-	velocity = 80.0 / sqrt(mass) + 3.0;
+	radius = pow(mass, 1/ 1.5);
+	velocity = 80.0 / sqrt(mass) + 2.0;
 	zoom = 50.0 / radius + 0.2;
-	mass = mass * 0.99995;
+	mass = mass * 0.99992;
 }
 
 void Player::setMass(double mass) {
@@ -76,9 +76,9 @@ std::tuple<int, int, int> Player::getColor() {
 
 void Player::strikePlayer(std::vector<Food*>& food_players) {
 
-	if (mass > 70) {
+	if (mass > 200) {
 
-		Vector2<double> pos = position + (2 * radius * direction);
+		Vector2<double> pos = position + (radius * direction);
 
 		Food* new_food = new Food(food_players.size(), pos, 15.0 * direction, 10, 20);
 		new_food->setColor(color);

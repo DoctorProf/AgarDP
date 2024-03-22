@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Player.hpp"
 #include "Food.hpp"
+#include <thread>
 
 #include <SFML/Network.hpp>
 
@@ -12,9 +13,17 @@ class Game {
 
 public:
 
-	Game(std::vector<Player*>& players, std::vector<Food*>& foods, int count_food);
+	Game(int& count_food, Vector2<int>& size_map);
 
-	void movePlayers();
+	void connectPlayer(TcpSocket*& socket);
+
+	void sendPositionFood(Player*& player);
+
+	void getFromPlayer();
+
+	void moveFoodPlayers();
+
+	void movePlayer();
 
 	void collisionFood();
 
@@ -24,19 +33,18 @@ public:
 
 	void updatePlayers();
 
-	void getFromPlayer();
-
 	void sendToPlayer();
 
-	void sendPositionFood(Player* player);
+	void GameThread();
 
 private:
 
-	std::vector<Player*>& players;
-	std::vector<Food*>& foods;
+	std::vector<Player*> players;
+	std::vector<Food*> foods;
 
 	std::vector<Food*> update_food;
 	std::vector<Food*> food_players;
 
 	int count_food;
+	Vector2<int> size_map;
 };

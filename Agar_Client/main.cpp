@@ -5,12 +5,12 @@
 #include <SFML/Network.hpp>
 #include <fstream>
 #include <SFML/GpuPreference.hpp>
-#include <ppl.h>
+#include <nlohmann/json.hpp>
 
 #define SFML_DEFINE_DISCRETE_GPU_PREFERENCE
 
 using namespace sf;
-
+using json = nlohmann::json;
 
 VertexArray createGrid(Vector2<int>& size_map)
 {
@@ -222,12 +222,12 @@ void render(Player*& player, std::vector<Player*>& players, std::vector<Food*>& 
 		food->draw(window);
 	}
 
-	player->draw(window);
-
 	for (Player* player : players) {
 
 		player->draw(window);
 	}
+
+	player->draw(window);
 
 	window.setView(gui);
 	window.draw(score);
@@ -235,6 +235,10 @@ void render(Player*& player, std::vector<Player*>& players, std::vector<Food*>& 
 }
 
 int main() {
+
+	std::ifstream file_config("config_client.json");
+
+	json config = json::parse(file_config);
 
 	TcpSocket* socket = new TcpSocket;
 
@@ -245,20 +249,23 @@ int main() {
 	bool strike = false;
 	bool segmentation = false;
 
-	Vector2<int> size_map = { 7680, 4320 };
+	Vector2<int> size_map{};
 
 	Vector2f size{};
+	
+	std::string ip = config["ip"];
+	int port = config["port"];
 
-	std::ifstream config("config.txt");
-
-	std::string ip;
-
-	std::getline(config, ip);
-
-	if (socket->connect(ip, 5000) != sf::Socket::Done) {
+	if (socket->connect(ip, port) != sf::Socket::Done) {
 
 		return -1;
 	}
+
+	Packet packet_size_map;
+
+	socket->receive(packet_size_map);
+
+	packet_size_map >> size_map.x >> size_map.y;
 
 	getPositionFood(socket, foods);
 

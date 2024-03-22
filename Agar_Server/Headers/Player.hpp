@@ -12,9 +12,9 @@ class Player {
 
 public:
 
-	Player(TcpSocket* socket, Vector2<double> position);
+	Player(TcpSocket*& socket, Vector2<double> position);
 
-	void move();
+	void move(Vector2<int> size_map);
 	
 	Vector2<double> getPosition();
 

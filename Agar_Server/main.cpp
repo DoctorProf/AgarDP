@@ -1,7 +1,6 @@
 ﻿#include <iostream>
 #include "Headers/Player.hpp"
 #include "Headers/Game.hpp"
-#include <thread>
 #include <nlohmann/json.hpp>
 #include <fstream>
 
@@ -15,14 +14,12 @@ int main() {
 
     json config = json::parse(file_config);
 
-    std::vector<Player*> players;
-
-    std::vector<Food*> foods;
-
     int count_food = config["count_food"];
     bool running = true;
 
-    Game game(players, foods, count_food);
+    Vector2<int> size_map = Vector2<int>(config["size_map"][0], config["size_map"][1]);
+
+    Game game(count_food, size_map);
 
     TcpListener listener;
 
@@ -39,31 +36,28 @@ int main() {
 
     while (running) {
 
-        if (selector.wait(seconds(0.0001))) {
+        if (selector.wait(seconds(0.001))) {
 
             if (selector.isReady(listener)) {
 
-                TcpSocket* new_connection = new TcpSocket;
+                TcpSocket* socket = new TcpSocket();
 
-                if (listener.accept(*new_connection) == sf::Socket::Done) {
+                if (listener.accept(*socket) == sf::Socket::Done) {
 
-                    Player* player = new Player(new_connection, Vector2<double>(data::generateNumber(-3840, 3840), data::generateNumber(-2160, 2160)));
-                    players.push_back(player);
-                    std::cout << " Players - " << players.size() << "\n";
-
-                    std::thread send_position_food(&Game::sendPositionFood, &game, std::ref(player));
-                    send_position_food.detach();
+                    game.connectPlayer(socket);
                 }
             }
         }
-
         game.getFromPlayer();
 
-        game.movePlayers();
+        game.movePlayer();
+        game.moveFoodPlayers();
+
         game.collisionFood();
         game.collisionPlayers();
 
         game.updateFood();
+
         game.updatePlayers();
 
         game.sendToPlayer();

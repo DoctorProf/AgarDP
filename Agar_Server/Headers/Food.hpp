@@ -13,7 +13,7 @@ public:
 
 	Food(int id, Vector2<double> position, Vector2<double> velocity, double radius, double mass);
 
-	void move();
+	void move(Vector2<int> size_map);
 
 	Vector2<double> getPosition();
 
