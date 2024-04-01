@@ -227,5 +227,4 @@ void Game::sendToPlayer() {
 
 void Game::GameThread() {
 	
-
 }
