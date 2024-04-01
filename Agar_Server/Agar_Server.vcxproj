@@ -132,12 +132,14 @@
     <ClCompile Include="Source\Data.cpp" />
     <ClCompile Include="Source\Food.cpp" />
     <ClCompile Include="Source\Game.cpp" />
+    <ClCompile Include="Source\PartPlayer.cpp" />
     <ClCompile Include="Source\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Data.hpp" />
     <ClInclude Include="Headers\Food.hpp" />
     <ClInclude Include="Headers\Game.hpp" />
+    <ClInclude Include="Headers\PartPlayer.hpp" />
     <ClInclude Include="Headers\Player.hpp" />
   </ItemGroup>
   <ItemGroup>

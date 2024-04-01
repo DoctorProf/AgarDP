@@ -2,15 +2,14 @@
 
 #include <iostream>
 #include "Data.hpp"
-#include "PartPlayer.hpp"
 
 using namespace sf;
 
-class Player {
+class PartPlayer {
 
 public:
 
-	Player();
+	PartPlayer(double& radius, Vector2<double>& position);
 
 	void update();
 
@@ -24,15 +23,15 @@ public:
 
 	double getMass();
 
+	double getRadius();
+
 	void setRadius(double radius);
 
-	void clearParts();
-
-	void addPart(PartPlayer* new_part);
+	void setColor(int r, int g, int b);
 
 private:
 
-	std::vector<PartPlayer*> parts_player;
+	CircleShape part;
 
 	double mass;
 	double radius;

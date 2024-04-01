@@ -5,6 +5,7 @@
 #include "Data.hpp"
 #include <SFML/Network.hpp>
 #include "Food.hpp"
+#include "PartPlayer.hpp"
 
 using namespace sf;
 
@@ -20,21 +21,19 @@ public:
 
 	void setPosition(Vector2<double> position);
 
-	double getRadius();
-
-	void update();
-
-	void setMass(double mass);
-
-	double getMass();
-
 	TcpSocket* getSocket();
 
 	double getZoom();
 
+	double getMass();
+
 	void setLastMousePos(Vector2<double> last_mouse_pos);
 
 	std::tuple<int, int, int> getColor();
+
+	std::vector<PartPlayer*> getPartsPlayer();
+
+	void removePart(PartPlayer* part);
 
 	void strikePlayer(std::vector<Food*>& food_players);
 
@@ -43,13 +42,14 @@ public:
 private:
 
 	TcpSocket* socket;
+	
+	std::vector<PartPlayer*> parts_player;
 
-	double mass;
-	double radius;
 	Vector2<double> position;
 	Vector2<double> last_mouse_pos;
-	double velocity;
+
 	double zoom;
+	double mass;
 
 	double dist;
 	Vector2<double> direction;

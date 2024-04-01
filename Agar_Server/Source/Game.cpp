@@ -50,7 +50,7 @@ void Game::getFromPlayer() {
 
 		Packet packet_mouse_pos;
 
-		if (player->getSocket()->receive(packet_mouse_pos) != sf::Socket::Done) {
+		if (player->getSocket()->receive(packet_mouse_pos) != sf::Socket::Done || player->getPartsPlayer().size() == 0) {
 
 			players.erase(std::remove(players.begin(), players.end(), player), players.end());
 			delete player;
@@ -93,34 +93,43 @@ void Game::collisionFood() {
 	for (Player* player : players) {
 
 		update_food.clear();
+		bool foodCollision = true;
 
-		while (true) {
+		while (foodCollision) {
 
-			auto food = std::find_if(foods.begin(), foods.end(), [&](const auto& it) {
+			foodCollision = false;
+			for (PartPlayer* part_player : player->getPartsPlayer()) {
 
-				return data::distance(player->getPosition(), it->getPosition()) < player->getRadius() && it->getRadius() < player->getRadius();
-				});
+				for (auto it = foods.begin(); it != foods.end(); ) {
 
-			if (food == foods.end()) break;
+					if (data::distance(part_player->getPosition(), (*it)->getPosition()) < part_player->getRadius() && (*it)->getRadius() < part_player->getRadius()) {
 
-			player->setMass(player->getMass() + (*food)->getMass());
-			(*food)->regeneratePosition();
+						part_player->setMass(part_player->getMass() + (*it)->getMass());
+						(*it)->regeneratePosition();
+						update_food.push_back(*it);
+						it = foods.erase(it);
+						foodCollision = true;
+					}
+					else {
 
-			update_food.push_back(*food);
-		}
-		while (true) {
+						++it;
+					}
+				}
+				for (auto it = food_players.begin(); it != food_players.end(); ) {
 
-			auto food_player = std::find_if(food_players.begin(), food_players.end(), [&](const auto& it) {
+					if (data::distance(part_player->getPosition(), (*it)->getPosition()) < part_player->getRadius() && (*it)->getRadius() < part_player->getRadius()) {
 
-				return data::distance(player->getPosition(), it->getPosition()) < player->getRadius() && it->getRadius() < player->getRadius();
-				});
+						part_player->setMass(part_player->getMass() + (*it)->getMass());
+						delete* it;
+						it = food_players.erase(it);
+						foodCollision = true;
+					}
+					else {
 
-			if (food_player == food_players.end()) break;
-
-			player->setMass(player->getMass() + (*food_player)->getMass());
-
-			delete* food_player;
-			food_players.erase(food_player);
+						++it;
+					}
+				}
+			}
 		}
 	}
 }
@@ -128,36 +137,35 @@ void Game::collisionFood() {
 void Game::collisionPlayers() {
 
 	for (auto it = players.begin(); it != players.end(); ++it) {
-
 		Player* player = *it;
 
-		auto player1 = std::find_if(players.begin(), players.end(), [&](const auto& other) {
+		for (auto other : players) {
 
-			return player != other && data::distance(player->getPosition(), other->getPosition()) < abs(player->getRadius() - other->getRadius());
-			});
+			for (auto part : player->getPartsPlayer()) {
 
-		if (player1 == players.end()) continue;
+				for (auto otherPart : other->getPartsPlayer()) {
 
-		if (std::abs(player->getMass() - (*player1)->getMass()) > (player->getMass() + (*player1)->getMass()) * 0.05) {
+					if (data::distance(part->getPosition(), otherPart->getPosition()) < abs(part->getRadius() - otherPart->getRadius())) {
 
-			if (player->getMass() > (*player1)->getMass()) {
+						if (part->getMass() > otherPart->getMass()) {
 
-				player->setMass(player->getMass() + (*player1)->getMass());
-				(*player1)->getSocket()->disconnect();
-				delete* player1;
-				players.erase(player1);
-			}
-			else {
+							part->setMass(part->getMass() + otherPart->getMass());
+							other->removePart(otherPart);
+							delete otherPart;
+						}
+						else {
 
-				(*player1)->setMass((*player1)->getMass() + player->getMass());
-				player->getSocket()->disconnect();
-				delete player;
-				players.erase(it);
-				break;
+							otherPart->setMass(otherPart->getMass() + part->getMass());
+							player->removePart(part);
+							delete part;
+						}
+					}
+				}
 			}
 		}
 	}
 }
+
 
 void Game::updateFood() {
 
@@ -191,8 +199,12 @@ void Game::updatePlayers() {
 
 			std::tuple<int, int, int> color = player1->getColor();
 
-			packet_player_data << player1->getRadius() << player1->getPosition().x << player1->getPosition().y << std::get<0>(color) << std::get<1>(color) << std::get<2>(color);
+			packet_player_data << player1->getPartsPlayer().size() << std::get<0>(color) << std::get<1>(color) << std::get<2>(color) ;
 
+			for (PartPlayer* part_player : player1->getPartsPlayer()) {
+
+				packet_player_data << part_player->getRadius() << part_player->getPosition().x << part_player->getPosition().y;
+			}
 		}
 		player->getSocket()->send(packet_player_data);
 
@@ -218,11 +230,15 @@ void Game::sendToPlayer() {
 
 		std::tuple<int, int, int> color = player->getColor();
 
-		packet_player << player->getRadius() << player->getMass() << player->getPosition().x << player->getPosition().y << player->getZoom() << std::get<0>(color) << std::get<1>(color) << std::get<2>(color);
+		packet_player << player->getPartsPlayer().size() << player->getZoom() << player->getMass() << std::get<0>(color) << std::get<1>(color) << std::get<2>(color) ;
+
+		for (PartPlayer* part_player : player->getPartsPlayer()) {
+
+			packet_player << part_player->getRadius() << part_player->getPosition().x << part_player->getPosition().y;
+		}
 
 		player->getSocket()->send(packet_player);
 	}
-	
 }
 
 void Game::GameThread() {

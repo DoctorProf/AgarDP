@@ -3,13 +3,16 @@
 
 Player::Player() {
 
-	player.setPointCount(100);
+
 }
 
 void Player::draw(RenderWindow& window) {
 
 	update();
-	window.draw(player);
+	for (PartPlayer* part_player : parts_player) {
+
+		part_player->draw(window);
+	}
 }
 
 void Player::setPosition(Vector2<double> position) {
@@ -40,12 +43,16 @@ void Player::setRadius(double radius) {
 
 void Player::update() {
 
-	player.setRadius(radius);
-	player.setOrigin(radius, radius);
-	player.setPosition(Vector2f(position));
+	radius = parts_player[0]->getRadius();
+	position = parts_player[0]->getPosition();
 }
 
-void Player::setColor(int r, int g, int b) {
+void Player::clearParts() {
 
-	player.setFillColor(Color(r, g, b));
+	parts_player.clear();
+}
+
+void Player::addPart(PartPlayer* new_part) {
+
+	parts_player.push_back(new_part);
 }
