@@ -15,7 +15,7 @@ public:
 
 	Player(TcpSocket*& socket, Vector2<double> position);
 
-	void move(Vector2<int> size_map);
+	void move(Vector2<int>& size_map);
 	
 	Vector2<double> getPosition();
 

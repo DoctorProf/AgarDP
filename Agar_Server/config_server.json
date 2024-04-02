@@ -1,5 +1,5 @@
 {
   "port" : 5000,
-  "count_food": 20000,
+  "count_food": 30000,
   "size_map": [ 7680, 4320 ]
 }

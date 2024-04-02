@@ -24,15 +24,23 @@ public:
 
 	double getMass();
 
+	size_t getCountParts();
+
+	std::vector<PartPlayer*> getPartsPlayer();
+
 	void setRadius(double radius);
 
 	void clearParts();
 
 	void addPart(PartPlayer* new_part);
 
+
+
 private:
 
 	std::vector<PartPlayer*> parts_player;
+
+	size_t count_parts;
 
 	double mass;
 	double radius;

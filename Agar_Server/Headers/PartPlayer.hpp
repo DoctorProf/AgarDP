@@ -14,7 +14,7 @@ public:
 
 	PartPlayer(Vector2<double>& position, double mass, double pulse = 0);
 
-	void move(double& dist, Vector2<double>& direction, Vector2<int> size_map);
+	void move(double& dist, Vector2<double>& direction, Vector2<int>& size_map);
 
 	Vector2<double> getPosition();
 

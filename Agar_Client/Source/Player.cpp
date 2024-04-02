@@ -8,7 +8,6 @@ Player::Player() {
 
 void Player::draw(RenderWindow& window) {
 
-	update();
 	for (PartPlayer* part_player : parts_player) {
 
 		part_player->draw(window);
@@ -22,6 +21,7 @@ void Player::setPosition(Vector2<double> position) {
 
 Vector2<double> Player::getPosition() {
 	
+	update();
 	return this->position;
 }
 
@@ -36,14 +36,19 @@ double Player::getMass() {
 	return this->mass;
 }
 
-void Player::setRadius(double radius) {
+size_t Player::getCountParts() {
 
-	this->radius = radius;
+	return count_parts;
+}
+
+std::vector<PartPlayer*> Player::getPartsPlayer() {
+
+	return parts_player;
 }
 
 void Player::update() {
 
-	radius = parts_player[0]->getRadius();
+	count_parts = parts_player.size();
 	position = parts_player[0]->getPosition();
 }
 

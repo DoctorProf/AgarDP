@@ -7,7 +7,7 @@ Game::Game(int& count_food, Vector2<int>& size_map) {
 
 	for (int i = 0; i < count_food; i++) {
 
-		foods.push_back(new Food(i, Vector2<double>(data::generateNumber(-size_map.x / 2, size_map.x / 2), data::generateNumber(-size_map.y / 2, size_map.y / 2)), { 0.0, 0.0 }, 5, 1));
+		foods.push_back(new Food(i, Vector2<double>(data::generateNumber(-size_map.x / 2, size_map.x / 2), data::generateNumber(-size_map.y / 2, size_map.y / 2)), { 0.0, 0.0 }, 5, 10));
 	}
 }
 
@@ -136,6 +136,7 @@ void Game::collisionFood() {
 
 void Game::collisionPlayers() {
 
+	//FIX
 	for (auto it = players.begin(); it != players.end(); ++it) {
 		Player* player = *it;
 
@@ -224,6 +225,7 @@ void Game::updatePlayers() {
 
 void Game::sendToPlayer() {
 
+	//FIX
 	for (Player* player : players) {
 
 		Packet packet_player;

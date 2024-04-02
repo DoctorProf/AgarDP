@@ -70,14 +70,24 @@ bool getFromServer(TcpSocket* socket, Player* player, double& zoom) {
 
 	packet_player >> count_parts >> zoom >> mass >> r >> g >> b;
 	
-	player->clearParts();
+	bool flag = count_parts == player->getCountParts();
+	if (!flag) player->clearParts();
 	for (int i = 0; i < count_parts; i++) {
 
 		packet_player >> radius >> position.x >> position.y;
 
-		PartPlayer* new_part = new PartPlayer(radius, position);
-		new_part->setColor(r, g, b);
-		player->addPart(new_part);
+		if (flag) {
+
+			PartPlayer* part = player->getPartsPlayer()[i];
+			part->setRadius(radius);
+			part->setPosition(position);
+		}
+		else {
+
+			PartPlayer* new_part = new PartPlayer(radius, position);
+			new_part->setColor(r, g, b);
+			player->addPart(new_part);
+		}
 	}
 
 	player->setMass(mass);
@@ -169,6 +179,7 @@ void generatePlayers(TcpSocket* socket, std::vector<Player*>& players) {
 		packet_player >> count_parts >> r >> g >> b;
 
 		Player* player = new Player;
+
 		for (int i = 0; i < count_parts; i++) {
 
 			packet_player >> radius >> position.x >> position.y;

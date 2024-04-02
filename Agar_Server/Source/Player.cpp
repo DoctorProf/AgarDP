@@ -7,17 +7,13 @@ Player::Player(TcpSocket*& socket, Vector2<double> position) : socket(socket) {
 	parts_player.push_back(new PartPlayer(position, 50.0));
 }
 
-void Player::move(Vector2<int> size_map) {
-
-	zoom = 50.0 / parts_player[0]->getRadius() + 0.2;
-	
-	position = parts_player[0]->getPosition();
-
-	dist = data::distance(last_mouse_pos, position);
-
-	direction = (last_mouse_pos - position) / dist;
+void Player::move(Vector2<int>& size_map) {
 	
 	for (PartPlayer* part_player : parts_player) {
+
+		dist = data::distance(last_mouse_pos, position);
+
+		direction = (last_mouse_pos - position) / dist;
 
 		part_player->move(dist, direction, size_map);
 	}
@@ -67,6 +63,10 @@ std::tuple<int, int, int> Player::getColor() {
 
 std::vector<PartPlayer*> Player::getPartsPlayer() {
 
+	zoom = 50.0 / parts_player[0]->getRadius() + 0.2;
+
+	position = parts_player[0]->getPosition();
+
 	return parts_player;
 }
 
@@ -85,7 +85,7 @@ void Player::strikePlayer(std::vector<Food*>& food_players) {
 
 		if (part_player->getMass() > 200) {
 
-			Vector2<double> pos = position + (part_player->getRadius() * direction);
+			Vector2<double> pos = part_player->getPosition() + (part_player->getRadius() * direction);
 
 			Food* new_food = new Food(food_players.size(), pos, 15.0 * direction, 10, 20);
 			new_food->setColor(color);
@@ -101,8 +101,8 @@ void Player::segmentationPlayer() {
 
 	for (int i = 0; i < size_parts; i++) {
 
-		Vector2<double> pos = position + (parts_player[i]->getRadius() * direction);
-		PartPlayer* new_part = new PartPlayer(pos, parts_player[i]->getMass() / 2.0, 8);
+		Vector2<double> pos = parts_player[i]->getPosition() + (parts_player[i]->getRadius() * direction);
+		PartPlayer* new_part = new PartPlayer(pos, parts_player[i]->getMass() / 2.0, 5);
 		parts_player[i]->setMass(parts_player[i]->getMass() / 2);
 		parts_player.push_back(new_part);
 	}

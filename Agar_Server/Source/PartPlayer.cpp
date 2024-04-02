@@ -8,7 +8,7 @@ PartPlayer::PartPlayer(Vector2<double>& position, double mass, double pulse) {
 	this->pulse = pulse;
 }
 
-void PartPlayer::move(double& dist, Vector2<double>& direction, Vector2<int> size_map) {
+void PartPlayer::move(double& dist, Vector2<double>& direction, Vector2<int>& size_map) {
 
 	update();
 
@@ -37,7 +37,7 @@ void PartPlayer::update() {
 	pulse *= 0.95;
 	radius = pow(mass, 1 / 1.5);
 	velocity = 80.0 / sqrt(mass) + 1.5 + pulse;
-	mass = mass * 0.99992;
+	mass *= 0.99992;
 }
 
 void PartPlayer::setMass(double mass) {
