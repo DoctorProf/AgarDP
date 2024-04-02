@@ -102,7 +102,7 @@ void Player::segmentationPlayer() {
 	for (int i = 0; i < size_parts; i++) {
 
 		Vector2<double> pos = position + (parts_player[i]->getRadius() * direction);
-		PartPlayer* new_part = new PartPlayer(pos, parts_player[i]->getMass() / 2.0, 5);
+		PartPlayer* new_part = new PartPlayer(pos, parts_player[i]->getMass() / 2.0, 8);
 		parts_player[i]->setMass(parts_player[i]->getMass() / 2);
 		parts_player.push_back(new_part);
 	}
