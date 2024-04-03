@@ -1,7 +1,7 @@
 #include "../Headers/PartPlayer.hpp"
 
 
-PartPlayer::PartPlayer(Vector2<double>& position, double mass, double pulse) {
+PartPlayer::PartPlayer(Player* player, Vector2<double>& position, double mass, double pulse) : player(player) {
 
 	this->position = position;
 	this->mass = mass;
@@ -30,6 +30,11 @@ void PartPlayer::setPosition(Vector2<double> position) {
 double PartPlayer::getRadius() {
 
 	return radius;
+}
+
+Player*& PartPlayer::getPlayer() {
+
+	return player;
 }
 
 void PartPlayer::update() {

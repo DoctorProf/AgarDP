@@ -7,7 +7,7 @@ Game::Game(int& count_food, Vector2<int>& size_map) {
 
 	for (int i = 0; i < count_food; i++) {
 
-		foods.push_back(new Food(i, Vector2<double>(data::generateNumber(-size_map.x / 2, size_map.x / 2), data::generateNumber(-size_map.y / 2, size_map.y / 2)), { 0.0, 0.0 }, 5, 10));
+		foods.push_back(new Food(i, Vector2<double>(data::generateNumber(-size_map.x / 2, size_map.x / 2), data::generateNumber(-size_map.y / 2, size_map.y / 2)), { 0.0, 0.0 }, 5, 1));
 	}
 }
 
@@ -136,37 +136,61 @@ void Game::collisionFood() {
 
 void Game::collisionPlayers() {
 
-	//FIX
-	for (auto it = players.begin(); it != players.end(); ++it) {
-		Player* player = *it;
+	std::vector<PartPlayer*> parts_to_remove{};
 
-		for (auto other : players) {
+	for (Player* player : players) {
 
-			for (auto part : player->getPartsPlayer()) {
+		for (Player* other_player : players) {
 
-				for (auto otherPart : other->getPartsPlayer()) {
+			for (PartPlayer* part_player : player->getPartsPlayer()) {
 
-					if (data::distance(part->getPosition(), otherPart->getPosition()) < abs(part->getRadius() - otherPart->getRadius())) {
+				for (PartPlayer* part_other_player : other_player->getPartsPlayer()) {
 
-						if (part->getMass() > otherPart->getMass()) {
+					if (part_player == part_other_player) continue;
 
-							part->setMass(part->getMass() + otherPart->getMass());
-							other->removePart(otherPart);
-							delete otherPart;
+					if (data::distance(part_player->getPosition(), part_other_player->getPosition()) < abs(part_player->getRadius() - part_other_player->getRadius())) {
+
+						if (part_player->getMass() > part_other_player->getMass()) {
+
+							auto it = std::find(other_player->getPartsPlayer().begin(), other_player->getPartsPlayer().end(), part_other_player);
+
+							if (it != other_player->getPartsPlayer().end()) {
+
+								part_player->setMass(part_player->getMass() + part_other_player->getMass());
+								parts_to_remove.push_back(part_other_player);
+							}
 						}
-						else {
+						else if (part_player->getMass() < part_other_player->getMass()) {
 
-							otherPart->setMass(otherPart->getMass() + part->getMass());
-							player->removePart(part);
-							delete part;
+							auto it = std::find(player->getPartsPlayer().begin(), player->getPartsPlayer().end(), part_player);
+
+							if (it != player->getPartsPlayer().end()) {
+
+								part_other_player->setMass(part_other_player->getMass() + part_player->getMass());
+								parts_to_remove.push_back(part_player);
+							}
 						}
 					}
 				}
 			}
 		}
 	}
-}
 
+	std::sort(parts_to_remove.begin(), parts_to_remove.end());
+	parts_to_remove.erase(std::unique(parts_to_remove.begin(), parts_to_remove.end()), parts_to_remove.end());
+
+	for (PartPlayer*& part : parts_to_remove) {
+
+		Player*& player = part->getPlayer();
+
+		std::vector<PartPlayer*>& parts = player->getPartsPlayer();
+
+		auto it = std::find(parts.begin(), parts.end(), part);
+
+		parts.erase(it);
+		delete part;
+	}
+}
 
 void Game::updateFood() {
 
@@ -225,7 +249,6 @@ void Game::updatePlayers() {
 
 void Game::sendToPlayer() {
 
-	//FIX
 	for (Player* player : players) {
 
 		Packet packet_player;

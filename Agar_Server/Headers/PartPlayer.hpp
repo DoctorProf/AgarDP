@@ -5,14 +5,17 @@
 #include "Data.hpp"
 #include <SFML/Network.hpp>
 #include "Food.hpp"
+#include "Player.hpp"
 
 using namespace sf;
+
+class Player;
 
 class PartPlayer {
 
 public:
 
-	PartPlayer(Vector2<double>& position, double mass, double pulse = 0);
+	PartPlayer(Player* player, Vector2<double>& position, double mass, double pulse = 0);
 
 	void move(double& dist, Vector2<double>& direction, Vector2<int>& size_map);
 
@@ -22,6 +25,8 @@ public:
 
 	double getRadius();
 
+	Player*& getPlayer();
+
 	void update();
 
 	void setMass(double mass);
@@ -30,6 +35,7 @@ public:
 
 private:
 
+	Player* player;
 	double mass;
 	double radius;
 	Vector2<double> position;

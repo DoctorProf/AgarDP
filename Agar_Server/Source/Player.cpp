@@ -4,7 +4,7 @@ Player::Player(TcpSocket*& socket, Vector2<double> position) : socket(socket) {
 
 	this->position = position;
 	this->color = data::randomColor();
-	parts_player.push_back(new PartPlayer(position, 50.0));
+	parts_player.push_back(new PartPlayer(this, position, 50.0));
 }
 
 void Player::move(Vector2<int>& size_map) {
@@ -61,7 +61,7 @@ std::tuple<int, int, int> Player::getColor() {
 	return color;
 }
 
-std::vector<PartPlayer*> Player::getPartsPlayer() {
+std::vector<PartPlayer*>& Player::getPartsPlayer() {
 
 	zoom = 50.0 / parts_player[0]->getRadius() + 0.2;
 
@@ -70,27 +70,18 @@ std::vector<PartPlayer*> Player::getPartsPlayer() {
 	return parts_player;
 }
 
-void Player::removePart(PartPlayer* part) {
-
-	auto it = std::find(parts_player.begin(), parts_player.end(), part);
-	if (it != parts_player.end()) {
-
-		parts_player.erase(it);
-	}
-}
-
 void Player::strikePlayer(std::vector<Food*>& food_players) {
 
 	for (PartPlayer* part_player : parts_player) {
 
-		if (part_player->getMass() > 200) {
+		if (part_player->getMass() > 100) {
 
 			Vector2<double> pos = part_player->getPosition() + (part_player->getRadius() * direction);
 
-			Food* new_food = new Food(food_players.size(), pos, 15.0 * direction, 10, 20);
+			Food* new_food = new Food(food_players.size(), pos, 15.0 * direction, 10, 10);
 			new_food->setColor(color);
 			food_players.push_back(new_food);
-			part_player->setMass(part_player->getMass() - 20);
+			part_player->setMass(part_player->getMass() - 10);
 		}
 	}
 }
@@ -101,8 +92,9 @@ void Player::segmentationPlayer() {
 
 	for (int i = 0; i < size_parts; i++) {
 
+		if (parts_player[i]->getMass() < 200) continue;
 		Vector2<double> pos = parts_player[i]->getPosition() + (parts_player[i]->getRadius() * direction);
-		PartPlayer* new_part = new PartPlayer(pos, parts_player[i]->getMass() / 2.0, 5);
+		PartPlayer* new_part = new PartPlayer(this, pos, parts_player[i]->getMass() / 2.0, 5);
 		parts_player[i]->setMass(parts_player[i]->getMass() / 2);
 		parts_player.push_back(new_part);
 	}

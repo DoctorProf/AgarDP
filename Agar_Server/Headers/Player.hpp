@@ -9,6 +9,8 @@
 
 using namespace sf;
 
+class PartPlayer;
+
 class Player {
 
 public:
@@ -31,9 +33,7 @@ public:
 
 	std::tuple<int, int, int> getColor();
 
-	std::vector<PartPlayer*> getPartsPlayer();
-
-	void removePart(PartPlayer* part);
+	std::vector<PartPlayer*>& getPartsPlayer();
 
 	void strikePlayer(std::vector<Food*>& food_players);
 
