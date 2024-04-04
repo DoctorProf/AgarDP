@@ -50,7 +50,7 @@ void Game::getFromPlayer() {
 
 		Packet packet_mouse_pos;
 
-		if (player->getSocket()->receive(packet_mouse_pos) != sf::Socket::Done || player->getPartsPlayer().size() == 0) {
+		if (player->getPartsPlayer().size() == 0 || player->getSocket()->receive(packet_mouse_pos) != sf::Socket::Done) {
 
 			players.erase(std::remove(players.begin(), players.end(), player), players.end());
 			delete player;
@@ -136,59 +136,49 @@ void Game::collisionFood() {
 
 void Game::collisionPlayers() {
 
-	std::vector<PartPlayer*> parts_to_remove{};
+	for (auto it_player = players.begin(); it_player != players.end(); ++it_player) {
 
-	for (Player* player : players) {
+		Player*& player = *it_player;
 
-		for (Player* other_player : players) {
+		for (auto it_other_player = players.begin(); it_other_player != players.end(); ++it_other_player) {
 
-			for (PartPlayer* part_player : player->getPartsPlayer()) {
+			Player*& other_player = *it_other_player;
 
-				for (PartPlayer* part_other_player : other_player->getPartsPlayer()) {
+			for (auto it_part_player = player->getPartsPlayer().begin(); it_part_player != player->getPartsPlayer().end(); ) {
 
-					if (part_player == part_other_player) continue;
+				PartPlayer*& part_player = *it_part_player;
+
+				for (auto it_part_other_player = other_player->getPartsPlayer().begin(); it_part_other_player != other_player->getPartsPlayer().end(); ) {
+
+					PartPlayer*& part_other_player = *it_part_other_player;
 
 					if (data::distance(part_player->getPosition(), part_other_player->getPosition()) < abs(part_player->getRadius() - part_other_player->getRadius())) {
 
 						if (part_player->getMass() > part_other_player->getMass()) {
 
-							auto it = std::find(other_player->getPartsPlayer().begin(), other_player->getPartsPlayer().end(), part_other_player);
-
-							if (it != other_player->getPartsPlayer().end()) {
-
-								part_player->setMass(part_player->getMass() + part_other_player->getMass());
-								parts_to_remove.push_back(part_other_player);
-							}
+							part_player->setMass(part_player->getMass() + part_other_player->getMass());
+							delete* it_part_other_player;
+							it_part_other_player = other_player->getPartsPlayer().erase(it_part_other_player);
 						}
 						else if (part_player->getMass() < part_other_player->getMass()) {
 
-							auto it = std::find(player->getPartsPlayer().begin(), player->getPartsPlayer().end(), part_player);
+							part_other_player->setMass(part_other_player->getMass() + part_player->getMass());
+							delete* it_part_player;
+							it_part_player = player->getPartsPlayer().erase(it_part_player);
+						}
+						else {
 
-							if (it != player->getPartsPlayer().end()) {
-
-								part_other_player->setMass(part_other_player->getMass() + part_player->getMass());
-								parts_to_remove.push_back(part_player);
-							}
+							++it_part_other_player;
 						}
 					}
+					else {
+
+						++it_part_other_player;
+					}
 				}
+				++it_part_player;
 			}
 		}
-	}
-
-	std::sort(parts_to_remove.begin(), parts_to_remove.end());
-	parts_to_remove.erase(std::unique(parts_to_remove.begin(), parts_to_remove.end()), parts_to_remove.end());
-
-	for (PartPlayer*& part : parts_to_remove) {
-
-		Player*& player = part->getPlayer();
-
-		std::vector<PartPlayer*>& parts = player->getPartsPlayer();
-
-		auto it = std::find(parts.begin(), parts.end(), part);
-
-		parts.erase(it);
-		delete part;
 	}
 }
 

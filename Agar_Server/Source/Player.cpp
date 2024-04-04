@@ -74,11 +74,11 @@ void Player::strikePlayer(std::vector<Food*>& food_players) {
 
 	for (PartPlayer* part_player : parts_player) {
 
-		if (part_player->getMass() > 100) {
+		if (part_player->getMass() > 200) {
 
 			Vector2<double> pos = part_player->getPosition() + (part_player->getRadius() * direction);
 
-			Food* new_food = new Food(food_players.size(), pos, 15.0 * direction, 10, 10);
+			Food* new_food = new Food(food_players.size(), pos, 12.0 * direction, 10, 10);
 			new_food->setColor(color);
 			food_players.push_back(new_food);
 			part_player->setMass(part_player->getMass() - 10);
@@ -92,7 +92,7 @@ void Player::segmentationPlayer() {
 
 	for (int i = 0; i < size_parts; i++) {
 
-		if (parts_player[i]->getMass() < 200) continue;
+		if (parts_player[i]->getMass() < 300) continue;
 		Vector2<double> pos = parts_player[i]->getPosition() + (parts_player[i]->getRadius() * direction);
 		PartPlayer* new_part = new PartPlayer(this, pos, parts_player[i]->getMass() / 2.0, 5);
 		parts_player[i]->setMass(parts_player[i]->getMass() / 2);
