@@ -6,12 +6,38 @@
 #include <fstream>
 #include <SFML/GpuPreference.hpp>
 #include <nlohmann/json.hpp>
+#include <codecvt>
 
 #define SFML_DEFINE_DISCRETE_GPU_PREFERENCE
 
 using namespace sf;
 using json = nlohmann::json;
 
+
+bool compareByMass(Player*& a, Player*& b) {
+
+	return a->getMass() > b->getMass();
+}
+
+std::vector<Text> sort(std::vector<Player*>& players, Player* player) {
+
+	std::vector<Text> result_text;
+	std::vector<Player*> sort_players = players;
+	sort_players.push_back(player);
+	std::sort(sort_players.begin(), sort_players.end(), compareByMass);
+
+	for (int i = 0; i < sort_players.size(); i++) {
+
+		Text new_text;
+		new_text.setCharacterSize(30);
+		new_text.setFillColor(Color::Black);
+		new_text.setFont(data::font);
+		new_text.setString(std::to_string(i + 1) + " " + sort_players[i]->getName() + " " + std::to_string((int)sort_players[i]->getMass()));
+		new_text.setPosition(Vector2f(1650, 10 + 20 * i));
+		result_text.push_back(new_text);
+	}
+	return result_text;
+}
 VertexArray createGrid(Vector2<int>& size_map)
 {
 	VertexArray grid;
@@ -170,15 +196,19 @@ void generatePlayers(TcpSocket* socket, std::vector<Player*>& players) {
 
 		size_t count_parts;
 		double radius;
+		double mass;
 		Vector2<double> position;
+		std::string name;
 
 		int r;
 		int g;
 		int b;
 
-		packet_player >> count_parts >> r >> g >> b;
+		packet_player >> count_parts >> r >> g >> b >> name >> mass;
 
-		Player* player = new Player;
+		Player* player = new Player(name);
+
+		player->setMass(mass);
 
 		for (int i = 0; i < count_parts; i++) {
 
@@ -254,14 +284,22 @@ void render(Player*& player, std::vector<Player*>& players, std::vector<Food*>& 
 
 	window.setView(gui);
 	window.draw(score);
+	for (Text text : sort(players, player)) {
+
+		window.draw(text);
+	}
 	window.display();
 }
 
 int main() {
 
+	
+
 	std::ifstream file_config("config_client.json");
 
 	json config = json::parse(file_config);
+
+	std::string name = config["name"];
 
 	TcpSocket* socket = new TcpSocket;
 
@@ -283,6 +321,12 @@ int main() {
 
 		return -1;
 	}
+
+	Packet packet_name;
+
+	packet_name << name;
+
+	socket->send(packet_name);
 
 	Packet packet_size_map;
 
@@ -312,7 +356,7 @@ int main() {
 
 	Vector2<double> last_mouse_pos;
 
-	Player* player = new Player();
+	Player* player = new Player(name);
 	double zoom = 1;
 
 	Text score;

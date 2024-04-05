@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Data.hpp"
 #include "PartPlayer.hpp"
+#include "string"
 
 using namespace sf;
 
@@ -10,7 +11,7 @@ class Player {
 
 public:
 
-	Player();
+	Player(std::string name);
 
 	void update();
 
@@ -34,7 +35,9 @@ public:
 
 	void addPart(PartPlayer* new_part);
 
+	void setName(std::string name);
 
+	std::string getName();
 
 private:
 
@@ -45,4 +48,5 @@ private:
 	double mass;
 	double radius;
 	Vector2<double> position;
+	std::string name;
 };

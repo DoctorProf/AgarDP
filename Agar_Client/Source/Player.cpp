@@ -1,9 +1,9 @@
 #include "../Headers/Player.hpp"
 
 
-Player::Player() {
+Player::Player(std::string name) {
 
-
+	this->name = name;
 }
 
 void Player::draw(RenderWindow& window) {
@@ -60,4 +60,14 @@ void Player::clearParts() {
 void Player::addPart(PartPlayer* new_part) {
 
 	parts_player.push_back(new_part);
+}
+
+void Player::setName(std::string name) {
+
+	this->name = name;
+}
+
+std::string Player::getName() {
+
+	return name;
 }

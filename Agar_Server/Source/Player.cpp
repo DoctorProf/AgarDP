@@ -1,9 +1,10 @@
 #include "../Headers/Player.hpp"
 
-Player::Player(TcpSocket*& socket, Vector2<double> position) : socket(socket) {
+Player::Player(TcpSocket*& socket, Vector2<double> position, std::string name) : socket(socket) {
 
 	this->position = position;
 	this->color = data::randomColor();
+	this->name = name;
 	parts_player.push_back(new PartPlayer(this, position, 50.0));
 }
 
@@ -100,3 +101,12 @@ void Player::segmentationPlayer() {
 	}
 }
 
+void Player::setName(std::string name) {
+
+	this->name = name;
+}
+
+std::string Player::getName() {
+
+	return name;
+}

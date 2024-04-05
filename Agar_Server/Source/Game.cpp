@@ -13,7 +13,15 @@ Game::Game(int& count_food, Vector2<int>& size_map) {
 
 void Game::connectPlayer(TcpSocket*& socket) {
 
-	Player* player = new Player(socket, Vector2<double>(data::generateNumber(-size_map.x / 2, size_map.x / 2), data::generateNumber(-size_map.y / 2, size_map.y / 2)));
+	Packet packet_name;
+
+	socket->receive(packet_name);
+
+	std::string name;
+
+	packet_name >> name;
+
+	Player* player = new Player(socket, Vector2<double>(data::generateNumber(-size_map.x / 2, size_map.x / 2), data::generateNumber(-size_map.y / 2, size_map.y / 2)), name);
 
 	players.push_back(player);
 
@@ -90,9 +98,9 @@ void Game::movePlayer() {
 
 void Game::collisionFood() {
 
+	update_food.clear();
 	for (Player* player : players) {
 
-		update_food.clear();
 		bool foodCollision = true;
 
 		while (foodCollision) {
@@ -100,19 +108,14 @@ void Game::collisionFood() {
 			foodCollision = false;
 			for (PartPlayer* part_player : player->getPartsPlayer()) {
 
-				for (auto it = foods.begin(); it != foods.end(); ) {
+				for (auto it = foods.begin(); it != foods.end(); it++) {
 
 					if (data::distance(part_player->getPosition(), (*it)->getPosition()) < part_player->getRadius() && (*it)->getRadius() < part_player->getRadius()) {
 
 						part_player->setMass(part_player->getMass() + (*it)->getMass());
 						(*it)->regeneratePosition();
 						update_food.push_back(*it);
-						it = foods.erase(it);
 						foodCollision = true;
-					}
-					else {
-
-						++it;
 					}
 				}
 				for (auto it = food_players.begin(); it != food_players.end(); ) {
@@ -126,7 +129,7 @@ void Game::collisionFood() {
 					}
 					else {
 
-						++it;
+						it++;
 					}
 				}
 			}
@@ -214,7 +217,7 @@ void Game::updatePlayers() {
 
 			std::tuple<int, int, int> color = player1->getColor();
 
-			packet_player_data << player1->getPartsPlayer().size() << std::get<0>(color) << std::get<1>(color) << std::get<2>(color) ;
+			packet_player_data << player1->getPartsPlayer().size() << std::get<0>(color) << std::get<1>(color) << std::get<2>(color) << player1->getName() << player1->getMass();
 
 			for (PartPlayer* part_player : player1->getPartsPlayer()) {
 

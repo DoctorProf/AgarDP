@@ -6,6 +6,7 @@
 #include <SFML/Network.hpp>
 #include "Food.hpp"
 #include "PartPlayer.hpp"
+#include "string"
 
 using namespace sf;
 
@@ -15,7 +16,7 @@ class Player {
 
 public:
 
-	Player(TcpSocket*& socket, Vector2<double> position);
+	Player(TcpSocket*& socket, Vector2<double> position, std::string name);
 
 	void move(Vector2<int>& size_map);
 	
@@ -39,6 +40,10 @@ public:
 
 	void segmentationPlayer();
 
+	void setName(std::string name);
+
+	std::string getName();
+
 private:
 
 	TcpSocket* socket;
@@ -50,6 +55,7 @@ private:
 
 	double zoom;
 	double mass;
+	std::string name;
 
 	double dist;
 	Vector2<double> direction;
