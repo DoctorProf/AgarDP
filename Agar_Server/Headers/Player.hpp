@@ -36,9 +36,9 @@ public:
 
 	std::vector<PartPlayer*>& getPartsPlayer();
 
-	void strikePlayer(std::vector<Food*>& food_players);
+	void strikePlayer(std::vector<Food*>& food_players, Vector2<int>& size_map);
 
-	void segmentationPlayer();
+	void segmentationPlayer(Vector2<int>& size_map);
 
 	void setName(std::string name);
 

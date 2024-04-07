@@ -18,4 +18,3 @@ namespace data {
 	std::tuple<int, int, int> randomColor();
 
 }
-

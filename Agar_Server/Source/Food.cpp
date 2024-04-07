@@ -51,4 +51,3 @@ std::tuple<int, int, int> Food::getColor() {
 
 	return color;
 }
-

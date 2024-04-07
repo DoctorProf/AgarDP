@@ -71,13 +71,15 @@ std::vector<PartPlayer*>& Player::getPartsPlayer() {
 	return parts_player;
 }
 
-void Player::strikePlayer(std::vector<Food*>& food_players) {
+void Player::strikePlayer(std::vector<Food*>& food_players, Vector2<int>& size_map) {
 
 	for (PartPlayer* part_player : parts_player) {
 
-		if (part_player->getMass() > 200) {
+		if (part_player->getMass() > 300) {
 
 			Vector2<double> pos = part_player->getPosition() + (part_player->getRadius() * direction);
+
+			if (!data::frame_collision(pos, size_map)) return;
 
 			Food* new_food = new Food(food_players.size(), pos, 12.0 * direction, 10, 10);
 			new_food->setColor(color);
@@ -87,14 +89,17 @@ void Player::strikePlayer(std::vector<Food*>& food_players) {
 	}
 }
 
-void Player::segmentationPlayer() {
+void Player::segmentationPlayer(Vector2<int>& size_map) {
 
 	int size_parts = parts_player.size();
 
 	for (int i = 0; i < size_parts; i++) {
 
-		if (parts_player[i]->getMass() < 300) continue;
+		if (parts_player[i]->getMass() < 500) continue;
 		Vector2<double> pos = parts_player[i]->getPosition() + (parts_player[i]->getRadius() * direction);
+
+		if (!data::frame_collision(pos, size_map)) return;
+
 		PartPlayer* new_part = new PartPlayer(this, pos, parts_player[i]->getMass() / 2.0, 5);
 		parts_player[i]->setMass(parts_player[i]->getMass() / 2);
 		parts_player.push_back(new_part);

@@ -21,4 +21,3 @@ namespace data {
 
 	void loadFont();
 }
-

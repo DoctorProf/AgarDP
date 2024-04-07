@@ -75,8 +75,8 @@ void Game::getFromPlayer() {
 		packet_mouse_pos >> x >> y >> strike >> segmentation;
 		player->setLastMousePos(Vector2<double>(x, y));
 
-		if (strike) player->strikePlayer(food_players);
-		if (segmentation) player->segmentationPlayer();
+		if (strike) player->strikePlayer(food_players, size_map);
+		if (segmentation) player->segmentationPlayer(size_map);
 	}
 }
 
